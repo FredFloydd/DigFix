@@ -16,9 +16,14 @@ void main()
 {
     frag_texcoord = texcoord;  // We just copy texture coordinates and pass to fragment shader
 
-    // TODO: Transform vertex position from local to world coordinates
-    // TODO: Transform vertex normal from local to world coordinates
+    // Transform vertex position from local to world coordinates
 
+    vec4 homogeneous_oc_position = m_matrix * vec4(oc_position, 1.0);
+    wc_frag_pos = vec3(homogeneous_oc_position) / homogeneous_oc_position[3];
+
+    // Transform vertex normal from local to world coordinates
+
+    wc_frag_normal = normal_matrix * oc_normal;
 
     // The position is projected to the screen coordinates using mvp_matrix
     gl_Position = mvp_matrix * vec4(oc_position, 1.0);

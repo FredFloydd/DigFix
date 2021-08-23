@@ -258,7 +258,7 @@ public class OpenGLApplication {
 		try {
 			ImageIO.write(image, "png", new File(output_path));
 		} catch (IOException e) {
-			throw new RuntimeException("failed to write output file - ask for a demonstrator");
+			throw new RuntimeException("failed to write output file");
 		}
 	}
 	
@@ -280,6 +280,6 @@ public class OpenGLApplication {
 	private void checkError() {
 		int error = glGetError();
 		if (error != GL_NO_ERROR)
-			throw new RuntimeException("OpenGL produced an error (code " + error + ") - ask for a demonstrator");
+			throw new RuntimeException("OpenGL produced an error (code " + error + ")");
 	}
 }
