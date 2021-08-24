@@ -22,14 +22,14 @@ void main()
 {
 	vec3 linear_color = vec3(0, 0, 0);
 	// Calculate colour using Phong illumination model
-	vec3 point_light_position = vec3(10, 10, 0);
+	vec3 point_light_position = vec3(0, 10, 0);
     vec3 point_light_colour = vec3(1, 1, 1);
     float point_light_intensity = 100;
 
     float ambient_intensity = 0.2;
     float k_diffuse = 0.9;
-    float k_specular = 0.6;
-    float alpha = 0.8;
+    float k_specular = 0.1;
+    float alpha = 10;
 
     vec3 view_ray = normalize(wc_frag_pos - wc_camera_position);
     vec3 reflected_ray = normalize(reflect(point_light_position - wc_frag_pos, wc_frag_normal));
@@ -37,7 +37,7 @@ void main()
 
     float light_intensity = point_light_intensity / pow(length(point_light_position - wc_frag_pos), 2);
 
-    // Sample texture to obtain C_d
+    // Sample texture to obtain c_diffuse
     vec3 c_diffuse = vec3(texture(tex, frag_texcoord));
 
 	// Calculate Phong illumination
