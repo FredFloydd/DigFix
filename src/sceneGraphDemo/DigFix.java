@@ -33,7 +33,6 @@ public class DigFix {
 
             if (output != null) {
                 app.initialize();
-                app.takeScreenshot(output);
             } else {
                 app.run();
             }
