@@ -43,17 +43,11 @@ public abstract class Mesh {
 	abstract int[]  initializeVertexIndices();
 	abstract float[]  initializeVertexNormals();
 	abstract float[]  initializeTextureCoordinates();
-	
-	/**
-	 * Create mesh object.
-	 */
-	public Mesh() {
 
+	public Mesh() {
 	}
 
-	/**
-	 * Initialise. Make sure this is called before you start using the mesh
-	 */
+	// Initialize mesh
 	public void initialize() {
 
 		float vertPositions[] = initializeVertexPositions();
@@ -65,13 +59,7 @@ public abstract class Mesh {
 		loadDataOntoGPU( vertPositions, indices, vertNormals, textureCoordinates );
 	}
 	
-	/**
-	 * Move the data from Java arrays to OpenGL buffers (these are most likely on the GPU)
-	 * @param vertPositions
-	 * @param indices
-	 * @param vertNormals
-	 * @param textureCoordinates
-	 */
+	// Move the data from Java arrays to OpenGL buffers (these are most likely on the GPU)
 	protected void loadDataOntoGPU( float[] vertPositions, int[] indices, float[] vertNormals, float[] textureCoordinates ) {
 
 		vertexArrayObj = glGenVertexArrays(); // Get a OGL "name" for a vertex-array object

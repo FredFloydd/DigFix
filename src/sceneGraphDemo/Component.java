@@ -28,7 +28,6 @@ public abstract class Component {
     protected final static String FSHADER_FN = "resources/cube_fragment_shader.glsl";
 
     // Define variables universal to drawable objects
-
     protected Mesh mesh;                   // Mesh of the component
     protected ShaderProgram shader;        // Shader to colour the component mesh
     protected Texture texture;             // Texture image to be used by the component shader
@@ -77,8 +76,6 @@ public abstract class Component {
         shader.reloadIfNeeded();
         shader.useProgram();
 
-        // Step 2: Pass relevant data to the vertex shader
-
         // compute and upload MVP
         Matrix4f mvp_matrix = new Matrix4f(camera.getProjectionMatrix()).mul(camera.getViewMatrix()).mul(modelMatrix);
         shader.uploadMatrix4f(mvp_matrix, "mvp_matrix");
@@ -87,7 +84,7 @@ public abstract class Component {
         shader.uploadMatrix4f(modelMatrix, "m_matrix");
         shader.uploadVector3f(camera.getCameraPosition(), "wc_camera_position");
 
-        // Transformation by a nonorthogonal matrix does not preserve angles
+        // Transformation by a non-orthogonal matrix does not preserve angles
         // Thus we need a separate transformation matrix for normals
         Matrix3f normal_matrix = new Matrix3f();
         // Calculate normal transformation matrix
@@ -95,13 +92,13 @@ public abstract class Component {
 
         shader.uploadMatrix3f(normal_matrix, "normal_matrix");
 
-        // Step 3: Draw our VertexArray as triangles
         // Bind Texture
         texture.bindTexture();
-        // draw
-        glBindVertexArray(mesh.vertexArrayObj); // Bind the existing VertexArray object
-        glDrawElements(GL_TRIANGLES, mesh.no_of_triangles, GL_UNSIGNED_INT, 0); // Draw it as triangles
-        glBindVertexArray(0);             // Remove the binding
+
+        // Draw
+        glBindVertexArray(mesh.vertexArrayObj);                                          // Bind the existing VertexArray object
+        glDrawElements(GL_TRIANGLES, mesh.no_of_triangles, GL_UNSIGNED_INT, 0);   // Draw it as triangles
+        glBindVertexArray(0);                                                            // Remove the binding
 
         // Unbind texture
         texture.unBindTexture();

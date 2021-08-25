@@ -8,10 +8,9 @@ import java.util.List;
 
 import static org.lwjgl.opengl.GL20.*;
 
-/**
- * Shader class loads and compiles shaders so they can be attached to a ShaderProgram.
- */
+//Shader class loads and compiles shaders, so they can be attached to a ShaderProgram.
 public class Shader {
+
     private int shaderID = 0;
     private int type;
     private String filename;
@@ -23,11 +22,7 @@ public class Shader {
         load( type, filename );
     }
 
-    /**
-     * Load shaderID from file and compile it
-     * @param type GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
-     * @param filename name of the text file with the GLSL shaderID
-     */
+     // Load shaderID from file and compile it
     public void load(int type, String filename) {
 
         // Read the shaderID source code from file
@@ -54,10 +49,8 @@ public class Shader {
         }
     }
 
-    /**
-     * Reload shader if the file has been modified
-     * @return true if the shader was reloaded
-     */
+
+     // Reload shader if the file has been modified
     public boolean reloadIfNeeded() {
         long timestamp = getFragmentShaderTimestamp();
         if (shaderTimestamp != timestamp) {

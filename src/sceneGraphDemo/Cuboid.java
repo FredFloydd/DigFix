@@ -31,10 +31,9 @@ public class Cuboid extends Component{
     // Location of origin within cuboid
     private Vector3f origin;
 
-    // Constructor
-    public Cuboid(float x_, float y_, float z_, Vector3f origin_,
-                  Vector3f initial_position, Matrix4f initial_orientation,
-                  String texture_filename) {
+    public Cuboid(float x_, float y_, float z_, Vector3f origin_,  Vector3f initial_position,
+                  Matrix4f initial_orientation, String texture_filename) {
+
         // Initialise basic parameters
         x = x_;
         y = y_;

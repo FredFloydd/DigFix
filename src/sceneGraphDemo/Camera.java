@@ -1,5 +1,6 @@
 package sceneGraphDemo;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -11,49 +12,59 @@ import org.joml.Vector3f;
  */
 public class Camera {
 
-    // Spherical coordinates for positioning camera
-    private float azimuth; // Angle camera makes with +Z
-    private float elevation; // Angle camera makes with ground plane
-    private float distance; // Distance from camera to origin
+    // Vector position, view direction and up direction of camera
+    private Vector3f position;
+    private Vector3f view_Direction;
+    private Vector3f up;
 
+    // Matrix describing camera position and orientation
+    private Matrix4f transform;
+
+    // Field of view and aspect ratios
     private float fov_y; // Vertical field-of-view of camera in radians
     private float aspect_ratio; // Aspect ratio of camera
 
-    public Camera(double aspect_ratio, float fov_y) {
+    public Camera(double aspect_ratio, float fov_y, Vector3f initial_position, Vector3f initial_direction, Vector3f up_) {
         this.aspect_ratio = (float) aspect_ratio;
-        this.azimuth = (float)Math.PI / 4;
-        this.elevation = (float)Math.PI / 4;
-        this.distance = 8;
+        this.position = initial_position;
+        this.view_Direction = initial_direction;
+        this.up = up_;
+        this.transform = new Matrix4f().lookAlong(initial_direction, up).translate(initial_position.mul(-1));
         this.fov_y = fov_y;
     }
 
-    public void rotate(double dx, double dy) {
-        final float sensitivity = -.005f;
-        azimuth += sensitivity * dx;
-        elevation -= sensitivity * dy;
-        elevation = (float)(Math.max(0, Math.min(Math.PI / 2 - 0.001, elevation)));
+    public void rotate(float angle, Vector3f axis){
+        Matrix4f rotation = new Matrix4f().rotate(angle, axis);
+        transform = transform.mulLocal(rotation);
+        view_Direction = view_Direction.mul(new Matrix3f(rotation));
     }
 
-    public void zoom(boolean in) {
-        final float sensitivity = 1.05f;
-        if (in)
-            distance /= sensitivity;
-        else
-            distance *= sensitivity;
+    public void move(Vector3f movement_vector){
+        Matrix4f translation = new Matrix4f().translate(movement_vector);
+        transform = transform.mulLocal(translation);
+        position = position.add(movement_vector);
+    }
+
+    public void set_position(Vector3f new_position){
+        transform.translate(new_position);
+        transform.translate(position.mul(-1));
+        position = new_position;
+    }
+
+    public void set_view_direction(Vector3f new_direction){
+        transform.translate(position);
+        transform.lookAlong(new_direction, up);
     }
 
     public Matrix4f getViewMatrix() {
-        Vector3f position = getCameraPosition();
-        Vector3f origin = new Vector3f(0, 0, 0);
-        Vector3f up = new Vector3f(0, 1, 0);
+        return transform;
+    }
 
-        return new Matrix4f().lookAt(position, origin, up);
+    public Vector3f getViewDirection(){
+        return view_Direction;
     }
 
     public Vector3f getCameraPosition() {
-        //compute camera position from elevation and azimuth
-        Vector3f position = new Vector3f((float) (distance * Math.cos(elevation) * Math.sin(azimuth)),
-                (float) (distance * Math.sin(elevation)), (float) (distance * Math.cos(elevation) * Math.cos(azimuth)));
         return position;
     }
 
@@ -61,12 +72,6 @@ public class Camera {
         return new Matrix4f().perspective(fov_y, aspect_ratio, 0.01f, 100f);
     }
 
-    public float getAzimuth() { return azimuth; }
-    public float getElevation() { return elevation; }
-    public float getDistance() { return distance; }
     public float getAspectRatio() { return aspect_ratio; }
-    public void setAzimuth(float azimuth) { this.azimuth = azimuth; }
-    public void setElevation(float elevation) { this.elevation = elevation; }
-    public void setDistance(float distance) { this.distance = distance; }
     public void setAspectRatio(float aspect_ratio) { this.aspect_ratio = aspect_ratio; }
 }

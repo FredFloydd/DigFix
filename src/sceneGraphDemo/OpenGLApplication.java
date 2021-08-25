@@ -41,13 +41,15 @@ public class OpenGLApplication {
 	private GLFWScrollCallback scroll_cb;
 	private GLFWKeyCallback key_cb;
 
-	
+	// Robots as part of scene
 	private CubeRobot cubeRobot;
+	private CubeRobot cubeRobot2;
+	private CubeRobot cubeRobot3;
 
-	/***
-	 * Initialise OpenGL and the scene
-	 * @throws Exception
-	 */
+	// Player
+	private Player player;
+
+	// Initialize OpenGL and the world
 	public void initialize() throws Exception {
 
 		if (glfwInit() != true)
@@ -63,7 +65,7 @@ public class OpenGLApplication {
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // Use CORE OpenGL profile without depreciated functions
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Make it forward compatible
 
-		window = glfwCreateWindow(WIDTH, HEIGHT, "Scene Graph Demo", NULL, NULL);
+		window = glfwCreateWindow(WIDTH, HEIGHT, "DigFix", NULL, NULL);
 		if (window == NULL)
 			throw new RuntimeException("Failed to create the application window.");
 
@@ -85,12 +87,22 @@ public class OpenGLApplication {
 		// Do depth comparisons when rendering
 		glEnable(GL_DEPTH_TEST);
 
+		CubeRobot player_robot = new CubeRobot();
+		player_robot.rotate((float) Math.PI, new Vector3f(0f, 1f, 0f));
+		player = new Player(player_robot, new Vector3f(0f, 0f, 10f), new Vector3f(0f, 0f, -1f),
+				WIDTH / HEIGHT, FOV_Y, new Vector3f(0f, 1f, 0f));
+
 		// Create camera, and setup input handlers
-		camera = new Camera((double) WIDTH / HEIGHT, FOV_Y);
+		camera = player.camera;
 		initializeInputs();
-		
+
 		// This is where we are creating the meshes
 		cubeRobot = new CubeRobot();
+		cubeRobot.move(new Vector3f(-5f, 0f, -10f));
+		cubeRobot2 = new CubeRobot();
+		cubeRobot2.move(new Vector3f(5f, 0f, -10f));
+		cubeRobot3 = new CubeRobot();
+		cubeRobot3.move(new Vector3f(0f, 0f, -10f));
 
 		startTime = System.currentTimeMillis();
 		currentTime = System.currentTimeMillis();
@@ -105,38 +117,32 @@ public class OpenGLApplication {
 			public void invoke(long window, double mouseX, double mouseY) {
 				boolean dragging = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
 				if (dragging) {
-					camera.rotate(mouseX - prevMouseX, mouseY - prevMouseY);
+					//camera.rotate(mouseX - prevMouseX, mouseY - prevMouseY);
 				}
 				prevMouseX = mouseX;
 				prevMouseY = mouseY;
 			}
 		};
 
-		// Callback for: when scrolling, zoom the camera
-		scroll_cb = new GLFWScrollCallback() {
-			public void invoke(long window, double dx, double dy) {
-				camera.zoom(dy > 0);
-			}
-		};
-
-		// Callback for keyboard controls: "W" - wireframe, "P" - points, "S" - take screenshot, "V" - capture frames for video, "Space" - Pause animation 
+		// Callback for keyboard controls: WASD to move
 		key_cb = new GLFWKeyCallback() {
 			public void invoke(long window, int key, int scancode, int action, int mods) {
 				if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-					glDisable(GL_CULL_FACE);
-				} else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
-					glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+					player.walking_directions.x = 1;
+				} else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
+					player.walking_directions.x = 0;
+				} else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
+					player.walking_directions.z = 1;
 				} else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-					takeScreenshot("screenshot.png");
-				} else if (key == GLFW_KEY_V && action == GLFW_RELEASE) {
-					captureVideoFrames("video_frames", 48);
-				} else if (key == GLFW_KEY_SPACE && action ==  GLFW_RELEASE) {
-					pause = !pause;
-				}
-				else if (action == GLFW_RELEASE) {
-					glEnable(GL_CULL_FACE);
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					player.walking_directions.z = 0;
+				} else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+					player.walking_directions.w = 1;
+				} else if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
+					player.walking_directions.w = 0;
+				} else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
+					player.walking_directions.y = 1;
+				} else if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
+					player.walking_directions.y = 0;
 				}
 			}
 		};
@@ -156,10 +162,7 @@ public class OpenGLApplication {
 		glfwSetFramebufferSizeCallback(window, fbs_cb);
 	}
 
-	/***
-	 * Run loop
-	 * @throws Exception
-	 */
+	// Run game
 	public void run() throws Exception {
 
 		initialize();
@@ -169,107 +172,35 @@ public class OpenGLApplication {
 		}
 	}
 	
-	/***
-	 * Draw the scene
-	 */
+	// Render the world
 	public void render() {
-		// render the scene
-		
-		// Step 1: Clear the buffer
+
+		// Clear the buffer
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set the background colour to white
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
-		
-		// Step 2: Pass relevant data to the vertex shader (done in CubeRobot.render())
-		// Step 3: Draw our VertexArray as triangles (done in CubeRobot.render())
+
 		long newTime = System.currentTimeMillis();
-		if(!pause) {
-			
-			elapsedTime += newTime - currentTime; // Time elapsed since the beginning of this program in millisecs
-			
-			float deltaTime = (newTime - currentTime) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
-			
-			cubeRobot.render(camera, deltaTime, elapsedTime);
-			
-		} else {
-			cubeRobot.render(camera, 0f, elapsedTime);
-		}
+
+		elapsedTime += newTime - currentTime; // Time elapsed since the beginning of this program in milliseconds
+
+		// Update player position
+		float deltaTime = (newTime - currentTime) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
+		player.updatePosition(deltaTime);
+
+		// Draw player and other world entities
+		cubeRobot.renderRobot(camera, deltaTime, elapsedTime);
+		cubeRobot2.renderRobot(camera, deltaTime, elapsedTime);
+		cubeRobot3.renderRobot(camera, deltaTime, elapsedTime);
+		player.body.renderRobot(camera, deltaTime, elapsedTime);
 		
 		currentTime = newTime;
-		
-		
+
 		checkError();
 		
-		// Step 4: Swap the draw and back buffers to display the rendered image
+		// Swap the draw and back buffers to display the rendered image
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 		checkError();
-	}
-
-	public void takeScreenshot(String output_path) {
-		int bpp = 4;
-
-		// Take screenshot of the fixed size irrespective of the window resolution
-		int screenshot_width = 800;
-		int screenshot_height = 600;
-
-		int fbo = glGenFramebuffers();
-		glBindFramebuffer( GL_FRAMEBUFFER, fbo );
-
-		int rgb_rb = glGenRenderbuffers();
-		glBindRenderbuffer( GL_RENDERBUFFER, rgb_rb );
-		glRenderbufferStorage( GL_RENDERBUFFER, GL_RGBA, screenshot_width, screenshot_height );
-		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, rgb_rb );
-
-		int depth_rb = glGenRenderbuffers();
-		glBindRenderbuffer( GL_RENDERBUFFER, depth_rb );
-		glRenderbufferStorage( GL_RENDERBUFFER, GL_DEPTH_COMPONENT, screenshot_width, screenshot_height );
-		glFramebufferRenderbuffer( GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depth_rb );
-		checkError();
-
-		float old_ar = camera.getAspectRatio();
-		camera.setAspectRatio( (float)screenshot_width  / screenshot_height );
-		glViewport(0,0, screenshot_width, screenshot_height );
-
-		render();
-		
-		camera.setAspectRatio( old_ar );
-
-		glReadBuffer(GL_COLOR_ATTACHMENT0);
-		ByteBuffer buffer = BufferUtils.createByteBuffer(screenshot_width * screenshot_height * bpp);
-		glReadPixels(0, 0, screenshot_width, screenshot_height, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
-		checkError();
-
-		glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-		glDeleteRenderbuffers( rgb_rb );
-		glDeleteRenderbuffers( depth_rb );
-		glDeleteFramebuffers( fbo );
-		checkError();
-
-		BufferedImage image = new BufferedImage(screenshot_width, screenshot_height, BufferedImage.TYPE_INT_ARGB);
-		for (int i = 0; i < screenshot_width; ++i) {
-			for (int j = 0; j < screenshot_height; ++j) {
-				int index = (i + screenshot_width * (screenshot_height - j - 1)) * bpp;
-				int r = buffer.get(index + 0) & 0xFF;
-				int g = buffer.get(index + 1) & 0xFF;
-				int b = buffer.get(index + 2) & 0xFF;
-				image.setRGB(i, j, 0xFF << 24 | r << 16 | g << 8 | b);
-			}
-		}
-		try {
-			ImageIO.write(image, "png", new File(output_path));
-		} catch (IOException e) {
-			throw new RuntimeException("failed to write output file");
-		}
-	}
-	
-	// Take screenshots of multiple frames
-	public void captureVideoFrames(String dir_path, int num_frames) {
-		File directory = new File(dir_path);
-		if(!directory.exists()) {
-			directory.mkdir();
-		}
-		for(int i = 0; i< num_frames; i++)
-			takeScreenshot(dir_path + "/frame_" + i + ".png");
 	}
 
 	public void stop() {

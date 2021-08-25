@@ -19,10 +19,9 @@ public class Texture {
     return texId;
   }
 
-/*  public byte gamma2linear(int v )
-  {
-    return (byte) (Math.pow( (double)v / 255., 2.2 )*255.);
-  }*/
+  public byte gamma2linear(int v ) {
+    return (byte) (Math.pow((double) v / 255., 2.2) * 255.);
+  }
 
   public int load(String filename) {
     ByteBuffer buffer = null;

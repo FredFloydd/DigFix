@@ -9,7 +9,7 @@ import org.joml.Vector3f;
 
 /**
  * Class inheriting from Mesh class
- * Defines a Cube mesh by overloading Mesh's 3D position, UV texture coordiantes and normals
+ * Defines a Cube mesh by overloading Mesh's 3D position, UV texture coordinates and normals
  *
  */
 public class CubeMesh extends Mesh {

@@ -2,10 +2,10 @@ package sceneGraphDemo;
 
 import sceneGraphDemo.OpenGLApplication;
 
-public class Tick2 {
+public class DigFix {
 
     public static void usageError() {
-        System.err.println("USAGE: <tick2> [--output OUTPUT]");
+        System.err.println("USAGE: <DigFix> [--output OUTPUT]");
         System.exit(-1);
     }
 

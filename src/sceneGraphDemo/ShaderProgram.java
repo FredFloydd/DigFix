@@ -13,10 +13,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
-
-/**
- * Combines vertex and fragment Shaders into a single program that can be used for rendering.
- */
+// Combines vertex and fragment Shaders into a single program that can be used for rendering.
 public class ShaderProgram {
     Shader vertex_shader;
     Shader fragment_shader;
@@ -60,15 +57,12 @@ public class ShaderProgram {
     	glUseProgram(program);
     }
     
-	/**
-	 * Tell vertex shader where it can find vertex attributes
-	 * @param variableName	- Which shader variable to bind provided data to
-	 * @param ArrayBufferHandle	- Reference to provided data (vertex positions, normals or texture coordinates)
-	 * @param AttribSize	- Dimensionality of provided data (vertex and normals = 3, texture coords = 2)
-	 */
+    // Tell vertex shader where it can find vertex attributes
     public void bindDataToShader(String variableName, int ArrayBufferHandle, int AttribSize) {
-    	glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferHandle); // Bring that buffer object into existence on GPU
-    	// Get the locations of the "position" vertex attribute variable in our ShaderProgram
+
+        glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferHandle); // Bring that buffer object into existence on GPU
+
+        // Get the locations of the "position" vertex attribute variable in our ShaderProgram
 		int variableLoc = glGetAttribLocation(getHandle(), variableName);
 
 		// If the vertex attribute does not exist, position_loc will be -1, so we should not use it
@@ -84,11 +78,7 @@ public class ShaderProgram {
 		}
     }
     
-	/**
-	 * Upload a 4x4 matrix 'm' to 'target' shader variable
-	 * @param m
-	 * @param target
-	 */
+	// Upload a 4x4 matrix 'm' to 'target' shader variable
     public void uploadMatrix4f(Matrix4f m, String target) {
 		int location = glGetUniformLocation(getHandle(), target);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(16);
@@ -96,11 +86,7 @@ public class ShaderProgram {
 		glUniformMatrix4fv(location, false, buffer);
     }
     
-	/**
-	 * Upload a 3x3 matrix 'm' to 'target' shader variable
-	 * @param m
-	 * @param target
-	 */
+	// Upload a 3x3 matrix 'm' to 'target' shader variable
     public void uploadMatrix3f(Matrix3f m, String target) {
 		int location = glGetUniformLocation(getHandle(), target);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(9);
@@ -108,11 +94,7 @@ public class ShaderProgram {
 		glUniformMatrix3fv(location, false, buffer);
     }
     
-	/**
-	 * Upload a 3D vector 'v' to 'target' shader variable
-	 * @param v
-	 * @param target
-	 */
+	//Upload a 3D vector 'v' to 'target' shader variable
     public void uploadVector3f(Vector3f v, String target) {
 		int location = glGetUniformLocation(getHandle(), target);
 		glUniform3f(location, v.x, v.y, v.z);
