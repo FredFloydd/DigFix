@@ -1,4 +1,4 @@
-package sceneGraphDemo;
+package DigFix;
 
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -19,7 +19,7 @@ import static org.lwjgl.opengl.GL20.glUniform3f;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 
 import java.lang.Math;
-import java.nio.FloatBuffer;;
+import java.nio.FloatBuffer;
 
 public class Cuboid extends Component{
 
@@ -45,12 +45,8 @@ public class Cuboid extends Component{
 
         // Initialise Shader
         shader = new ShaderProgram(new Shader(GL_VERTEX_SHADER, VSHADER_FN), new Shader(GL_FRAGMENT_SHADER, FSHADER_FN), "colour");
-        // Tell vertex shader where it can find vertex positions. 3 is the dimensionality of vertex position
-        // The prefix "oc_" means object coordinates
         shader.bindDataToShader("oc_position", mesh.vertex_handle, 3);
-        // Tell vertex shader where it can find vertex normals. 3 is the dimensionality of vertex normals
         shader.bindDataToShader("oc_normal", mesh.normal_handle, 3);
-        // Tell vertex shader where it can find texture coordinates. 2 is the dimensionality of texture coordinates
         shader.bindDataToShader("texcoord", mesh.tex_handle, 2);
 
         // Initialise Texturing

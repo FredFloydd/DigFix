@@ -1,4 +1,4 @@
-package sceneGraphDemo;
+package DigFix;
 
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
@@ -50,10 +50,10 @@ public abstract class Mesh {
 	// Initialize mesh
 	public void initialize() {
 
-		float vertPositions[] = initializeVertexPositions();
-		int indices[] = initializeVertexIndices();
-		float vertNormals[] = initializeVertexNormals();
-		float textureCoordinates[] = initializeTextureCoordinates();
+		float[] vertPositions = initializeVertexPositions();
+		int[] indices = initializeVertexIndices();
+		float[] vertNormals = initializeVertexNormals();
+		float[] textureCoordinates = initializeTextureCoordinates();
 		no_of_triangles = indices.length;
 
 		loadDataOntoGPU( vertPositions, indices, vertNormals, textureCoordinates );

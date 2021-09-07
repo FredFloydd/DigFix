@@ -1,10 +1,11 @@
-package sceneGraphDemo;
+package DigFix;
 
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -27,14 +28,13 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 public class OpenGLApplication {
 
 	private static final float FOV_Y = (float) Math.toRadians(50);
-	protected static int WIDTH = 800, HEIGHT = 600;
+	protected static int WIDTH = 1280, HEIGHT = 720;
 	private Camera camera;
 	private long window;
 	
 	private long currentTime;
 	private long startTime;
 	private long elapsedTime;
-	private boolean pause = false;
 
 	// Callbacks for input handling
 	private GLFWCursorPosCallback cursor_cb;
@@ -46,8 +46,11 @@ public class OpenGLApplication {
 	private CubeRobot cubeRobot2;
 	private CubeRobot cubeRobot3;
 
-	// Player
+	// Player and Robot for view control
 	private Player player;
+	private Robot robot;
+	private int centre_x;
+	private int centre_y;
 
 	// Initialize OpenGL and the world
 	public void initialize() throws Exception {
@@ -87,22 +90,24 @@ public class OpenGLApplication {
 		// Do depth comparisons when rendering
 		glEnable(GL_DEPTH_TEST);
 
-		CubeRobot player_robot = new CubeRobot();
-		player_robot.rotate((float) Math.PI, new Vector3f(0f, 1f, 0f));
-		player = new Player(player_robot, new Vector3f(0f, 0f, 10f), new Vector3f(0f, 0f, -1f),
-				WIDTH / HEIGHT, FOV_Y, new Vector3f(0f, 1f, 0f));
+		// Set up robot and centre coordinates for mouse tracking
+		robot = new Robot();
+		centre_x = mode.width() / 2;
+		centre_y = mode.height() / 2;
+		robot.mouseMove(centre_x, centre_y);
+
+		// Create player
+		player = new Player(new Vector3f(0f, 0f, 10f), new Vector3f(0f, 0f, -1f),
+				((float) WIDTH / (float) HEIGHT), FOV_Y, new Vector3f(0f, 1f, 0f));
 
 		// Create camera, and setup input handlers
 		camera = player.camera;
 		initializeInputs();
 
 		// This is where we are creating the meshes
-		cubeRobot = new CubeRobot();
-		cubeRobot.move(new Vector3f(-5f, 0f, -10f));
-		cubeRobot2 = new CubeRobot();
-		cubeRobot2.move(new Vector3f(5f, 0f, -10f));
-		cubeRobot3 = new CubeRobot();
-		cubeRobot3.move(new Vector3f(0f, 0f, -10f));
+		cubeRobot = new CubeRobot(new Vector3f(5f, 0f, -10f), new Vector3f(0f, 0f, 1f));
+		cubeRobot2 = new CubeRobot(new Vector3f(-5f, 0f, -10f), new Vector3f(0f, 0f, 1f));
+		cubeRobot3 = new CubeRobot(new Vector3f(0f, 0f, -10f), new Vector3f(0f, 0f, 1f));
 
 		startTime = System.currentTimeMillis();
 		currentTime = System.currentTimeMillis();
@@ -111,16 +116,16 @@ public class OpenGLApplication {
 	private void initializeInputs() {
 
 		// Callback for: when dragging the mouse, rotate the camera
+		robot.mouseMove(centre_x, centre_y);
+		// Callback for: when dragging the mouse, rotate the camera
 		cursor_cb = new GLFWCursorPosCallback() {
-			private double prevMouseX, prevMouseY;
 
 			public void invoke(long window, double mouseX, double mouseY) {
-				boolean dragging = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS;
-				if (dragging) {
-					//camera.rotate(mouseX - prevMouseX, mouseY - prevMouseY);
-				}
-				prevMouseX = mouseX;
-				prevMouseY = mouseY;
+				float sensitivity = 0.01f;
+				float anglex = (float) (mouseX - 640) * sensitivity;
+				float angley = (float) (mouseY - 330) * sensitivity;
+				player.updatePlayerOrientation(anglex, angley);
+				robot.mouseMove(centre_x, centre_y);
 			}
 		};
 
@@ -143,6 +148,8 @@ public class OpenGLApplication {
 					player.walking_directions.y = 1;
 				} else if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
 					player.walking_directions.y = 0;
+				} else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+					stop();
 				}
 			}
 		};
@@ -185,13 +192,13 @@ public class OpenGLApplication {
 
 		// Update player position
 		float deltaTime = (newTime - currentTime) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
-		player.updatePosition(deltaTime);
+		player.updatePosition(deltaTime, currentTime);
 
 		// Draw player and other world entities
-		cubeRobot.renderRobot(camera, deltaTime, elapsedTime);
-		cubeRobot2.renderRobot(camera, deltaTime, elapsedTime);
-		cubeRobot3.renderRobot(camera, deltaTime, elapsedTime);
-		player.body.renderRobot(camera, deltaTime, elapsedTime);
+		cubeRobot.renderRobot(camera, deltaTime, currentTime);
+		cubeRobot2.renderRobot(camera, deltaTime, currentTime);
+		cubeRobot3.renderRobot(camera, deltaTime, currentTime);
+		player.body.renderRobot(camera, deltaTime, currentTime);
 		
 		currentTime = newTime;
 

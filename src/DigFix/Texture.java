@@ -1,4 +1,4 @@
-package sceneGraphDemo;
+package DigFix;
 
 import java.awt.image.BufferedImage;
 import java.io.File;

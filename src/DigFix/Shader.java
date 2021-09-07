@@ -1,4 +1,4 @@
-package sceneGraphDemo;
+package DigFix;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,8 +12,8 @@ import static org.lwjgl.opengl.GL20.*;
 public class Shader {
 
     private int shaderID = 0;
-    private int type;
-    private String filename;
+    private final int type;
+    private final String filename;
     private long shaderTimestamp = 0;
 
     public Shader(int type, String filename) {

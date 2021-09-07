@@ -1,6 +1,4 @@
-package sceneGraphDemo;
-
-import sceneGraphDemo.OpenGLApplication;
+package DigFix;
 
 public class DigFix {
 
