@@ -1,6 +1,9 @@
 package DigFix;
 
+import org.joml.Matrix4f;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.*;
 
@@ -40,11 +43,11 @@ public class OpenGLApplication {
 	private GLFWCursorPosCallback cursor_cb;
 	private GLFWScrollCallback scroll_cb;
 	private GLFWKeyCallback key_cb;
+	private GLFWMouseButtonCallback mouse_cb;
 
-	// Robots as part of scene
-	private CubeRobot cubeRobot;
-	private CubeRobot cubeRobot2;
-	private CubeRobot cubeRobot3;
+	// Chunk made up of dirt blocks
+	private Chunk chunk;
+	private Cuboid skybox;
 
 	// Player and Robot for view control
 	private Player player;
@@ -97,17 +100,17 @@ public class OpenGLApplication {
 		robot.mouseMove(centre_x, centre_y);
 
 		// Create player
-		player = new Player(new Vector3f(0f, 0f, 10f), new Vector3f(0f, 0f, -1f),
+		player = new Player(new Vector3f(0f, 0f, 5f), new Vector3f(0f, 0f, -1f),
 				((float) WIDTH / (float) HEIGHT), FOV_Y, new Vector3f(0f, 1f, 0f));
 
 		// Create camera, and setup input handlers
 		camera = player.camera;
+		//camera = new Camera((float) WIDTH / (float) HEIGHT, FOV_Y, new Vector3f(0f, 1.75f, 40f), new Vector3f(0f, 0f, -1f), camera.up);
 		initializeInputs();
 
 		// This is where we are creating the meshes
-		cubeRobot = new CubeRobot(new Vector3f(5f, 0f, -10f), new Vector3f(0f, 0f, 1f));
-		cubeRobot2 = new CubeRobot(new Vector3f(-5f, 0f, -10f), new Vector3f(0f, 0f, 1f));
-		cubeRobot3 = new CubeRobot(new Vector3f(0f, 0f, -10f), new Vector3f(0f, 0f, 1f));
+		chunk = new Chunk(new Vector2i());
+		skybox = new Cuboid(new Vector3f(1000), new Vector3f(), new Vector3f(), new Matrix4f(), "resources/skybox.png");
 
 		startTime = System.currentTimeMillis();
 		currentTime = System.currentTimeMillis();
@@ -121,10 +124,10 @@ public class OpenGLApplication {
 		cursor_cb = new GLFWCursorPosCallback() {
 
 			public void invoke(long window, double mouseX, double mouseY) {
-				float sensitivity = 0.01f;
-				float anglex = (float) (mouseX - 640) * sensitivity;
-				float angley = (float) (mouseY - 330) * sensitivity;
-				player.updatePlayerOrientation(anglex, angley);
+				float sensitivity = 0.005f;
+				float angleX = (float) (mouseX - 640) * sensitivity;
+				float angleY = (float) (mouseY - 330) * sensitivity;
+				player.updatePlayerOrientation(angleX, angleY);
 				robot.mouseMove(centre_x, centre_y);
 			}
 		};
@@ -154,6 +157,14 @@ public class OpenGLApplication {
 			}
 		};
 
+		// Callback for keyboard controls: WASD to move
+		mouse_cb = new GLFWMouseButtonCallback() {
+			public void invoke(long window, int key, int action, int mods) {
+				if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+					player.breakBlock(chunk);
+			}
+		};
+
 		GLFWFramebufferSizeCallback fbs_cb = new GLFWFramebufferSizeCallback() {
 			@Override
 			public void invoke(long window, int width, int height) {
@@ -166,6 +177,7 @@ public class OpenGLApplication {
 		glfwSetCursorPosCallback(window, cursor_cb);
 		glfwSetScrollCallback(window, scroll_cb);
 		glfwSetKeyCallback(window, key_cb);
+		glfwSetMouseButtonCallback(window, mouse_cb);
 		glfwSetFramebufferSizeCallback(window, fbs_cb);
 	}
 
@@ -195,11 +207,13 @@ public class OpenGLApplication {
 		player.updatePosition(deltaTime, currentTime);
 
 		// Draw player and other world entities
-		cubeRobot.renderRobot(camera, deltaTime, currentTime);
-		cubeRobot2.renderRobot(camera, deltaTime, currentTime);
-		cubeRobot3.renderRobot(camera, deltaTime, currentTime);
-		player.body.renderRobot(camera, deltaTime, currentTime);
-		
+		//player.body.renderRobot(camera, deltaTime, currentTime);
+		chunk.renderChunk(camera, player.camera);
+		glCullFace(GL_FRONT);
+		skybox.render(camera);
+		glCullFace(GL_BACK);
+
+
 		currentTime = newTime;
 
 		checkError();

@@ -36,13 +36,18 @@ public class CubeRobot extends WorldObject{
 	private final Cuboid left_leg;
 	private final Cuboid right_leg;
 
+	// Dimensions of each bodypart
+	private final Vector3f body_dimensions = new Vector3f(0.5f, 0.75f, 0.25f);
+	private final Vector3f arm_dimensions = new Vector3f(0.25f, 0.75f, 0.25f);
+	private final Vector3f head_dimensions = new Vector3f(0.5f, 0.5f, 0.5f);
+	private final Vector3f leg_dimensions = new Vector3f(0.25f, 0.75f, 0.25f);
+	public final float viewHeight = 1.75f;
+
 	// Variables for animating walking
 	public boolean walking;
 	private final double max_arm_angle = 3 * Math.PI / 2;
 	private final double max_leg_angle = 3 * Math.PI / 4;
 	private final double angular_velocity = 2 * Math.PI / 1000;
-	private final double arms_angle;
-	private final double legs_angle;
 	public long start_walking;
 	private long time_walking;
 
@@ -50,37 +55,33 @@ public class CubeRobot extends WorldObject{
 	public CubeRobot(Vector3f position_, Vector3f orientation_) {
 
 		// Create body node
-		body = new Cuboid(1.6f, 2.4f, 0.8f, new Vector3f(0f, 0f, 0f),
-				new Vector3f(0f, 2.4f, 0f), new Matrix4f(), "resources/cubemap.png");
+		body = new Cuboid(body_dimensions, new Vector3f(), new Vector3f(0f, leg_dimensions.y + 0.5f * body_dimensions.y, 0f),
+				new Matrix4f(), "resources/dirt_texture.png");
 
 		// Create right arm node
-		right_arm = new Cuboid(0.8f, 2.4f, 0.8f, new Vector3f(0f, 1f, 0f),
-				new Vector3f(-1.2f, 3.4f, 0f), new Matrix4f(), "resources/cubemap.png");
+		right_arm = new Cuboid(arm_dimensions, new Vector3f(0f, 0.5f * arm_dimensions.y, 0f), new Vector3f(-0.5f * (body_dimensions.x + arm_dimensions.x),
+				leg_dimensions.y + body_dimensions.y, 0f), new Matrix4f(), "resources/dirt_texture.png");
 
 		// Create left arm node
-		left_arm = new Cuboid(0.8f, 2.4f, 0.8f, new Vector3f(0f, 1f, 0f),
-				new Vector3f(1.2f, 3.4f, 0f), new Matrix4f(), "resources/cubemap.png");
+		left_arm = new Cuboid(arm_dimensions, new Vector3f(0f, 0.5f * arm_dimensions.y , 0f), new Vector3f(0.5f * (body_dimensions.x + arm_dimensions.x),
+				leg_dimensions.y + body_dimensions.y, 0f), new Matrix4f(), "resources/dirt_texture.png");
 
 		// Create head node
-		head = new Cuboid(1.6f, 1.6f, 1.6f, new Vector3f(0f, -0.8f, 0f),
-				new Vector3f(0f, 3.6f, 0f), new Matrix4f(), "resources/cubemap_head.png");
+		head = new Cuboid(head_dimensions, new Vector3f(0f, -0.5f * head_dimensions.y, 0f),
+				new Vector3f(0f, leg_dimensions.y + body_dimensions.y, 0f), new Matrix4f(), "resources/dirt_texture.png");
 
 		// Create right leg node
-		right_leg = new Cuboid(0.8f, 2.4f, 0.8f, new Vector3f(0f, 1.2f, 0f),
-				new Vector3f(-0.4f, 1.2f, 0f), new Matrix4f(), "resources/cubemap.png");
+		right_leg = new Cuboid(leg_dimensions, new Vector3f(0f, 0.5f * leg_dimensions.y, 0f),
+				new Vector3f(-0.25f * body_dimensions.x, leg_dimensions.y, 0f), new Matrix4f(), "resources/dirt_texture.png");
 
 		// Create left leg node
-		left_leg = new Cuboid(0.8f, 2.4f, 0.8f, new Vector3f(0f, 1.2f, 0f),
-				new Vector3f(0.4f, 1.2f, 0f), new Matrix4f(), "resources/cubemap.png");
+		left_leg = new Cuboid(leg_dimensions, new Vector3f(0f, 0.5f * leg_dimensions.y, 0f),
+				new Vector3f(0.25f * body_dimensions.x, leg_dimensions.y, 0f), new Matrix4f(), "resources/dirt_texture.png");
 
 		// Create variables for moving robot in 3D space
 		position = position_;
 		orientation = orientation_;
 		up = new Vector3f(0f, 1f, 0f);
-
-		// Initialise angles for animation
-		arms_angle = 0;
-		legs_angle = 0;
 	}
 
 	public void renderRobot(Camera camera, float deltaTime, long currentTime) {

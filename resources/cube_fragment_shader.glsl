@@ -22,9 +22,9 @@ void main()
 {
 	vec3 linear_color = vec3(0, 0, 0);
 	// Calculate colour using Phong illumination model
-	vec3 point_light_position = vec3(0, 10, 0);
+	vec3 point_light_position = vec3(0, 100000, 0);
     vec3 point_light_colour = vec3(1, 1, 1);
-    float point_light_intensity = 100;
+    float point_light_intensity = 1000000000;
 
     float ambient_intensity = 0.2;
     float k_diffuse = 0.9;

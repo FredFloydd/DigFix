@@ -84,7 +84,7 @@ public abstract class Component {
     // Draws the component from its mesh
     private void renderMesh(Camera camera, Mesh mesh, Matrix4f modelMatrix, ShaderProgram shader, Texture texture) {
         // If shaders modified on disk, reload them
-        shader.reloadIfNeeded();
+        //shader.reloadIfNeeded();
         shader.useProgram();
 
         // compute and upload MVP

@@ -21,27 +21,25 @@ import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import java.lang.Math;
 import java.nio.FloatBuffer;
 
-public class Cuboid extends Component{
+public class Rectangle extends Component {
 
     // Side lengths
     private float x;
-    private float y;
     private float z;
 
     // Location of origin within cuboid
     private Vector3f origin;
 
-    public Cuboid(Vector3f dimensions, Vector3f origin_,  Vector3f initial_position,
+    public Rectangle(Vector3f dimensions, Vector3f origin_,  Vector3f initial_position,
                   Matrix4f initial_orientation, String texture_filename) {
 
         // Initialise basic parameters
         x = dimensions.x;
-        y = dimensions.y;
         z = dimensions.z;
         origin = origin_;
 
         // Initialise mesh
-        mesh = new CubeMesh();
+        mesh = new RectangleMesh();
 
         // Initialise Shader
         shader = new ShaderProgram(new Shader(GL_VERTEX_SHADER, VSHADER_FN), new Shader(GL_FRAGMENT_SHADER, FSHADER_FN), "colour");
@@ -67,7 +65,7 @@ public class Cuboid extends Component{
         initial_transform.translate(origin.mul(-1));
 
         // Scale the transformation matrix
-        initial_transform.scale(x / 2f, y / 2f, z / 2f);
+        initial_transform.scale(x / 2f, 1f, z / 2f);
 
         // Initialise position
         position = initial_position;
@@ -77,12 +75,11 @@ public class Cuboid extends Component{
     // Change dimensions while preserving origin
     public void change_Dimensions(float newX, float newY, float newZ){
         initial_transform = initial_transform.translate(origin);
-        initial_transform = initial_transform.scale(newX / x, newY / y, newZ / z);
+        initial_transform = initial_transform.scale(newX / x, 1f, newZ / z);
         initial_transform = initial_transform.translate(origin.mul(-1));
 
         origin = origin.mul(-1);
         x = newX;
-        y = newY;
         z = newZ;
     }
 

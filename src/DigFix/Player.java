@@ -2,6 +2,8 @@ package DigFix;
 
 import org.joml.*;
 
+import java.lang.Math;
+
 public class Player extends WorldObject {
 
     // Camera to render player view
@@ -20,11 +22,10 @@ public class Player extends WorldObject {
     public Player(Vector3f position_, Vector3f orientation_, float aspect_ratio, float fov_y, Vector3f up_) {
         body = new CubeRobot(position_, new Vector3f(orientation_.x, orientation_.y, orientation_.z));
         up = up_;
-        camera = new Camera(aspect_ratio, fov_y, new Vector3f(position_.x, position_.y + 4.4f,  position_.z), orientation_, up);
+        camera = new Camera(aspect_ratio, fov_y, new Vector3f(position_.x, position_.y + body.viewHeight,  position_.z), orientation_, up);
         setPosition(position_);
         setOrientation(orientation_);
         body.setOrientation(new Vector3f(orientation_.x, orientation_.y, orientation_.z));
-        //body.makeHeadInvisible();
         walking_directions = new Vector4i(0);
     }
 
@@ -59,6 +60,22 @@ public class Player extends WorldObject {
         body.rotate(-delta_phi, 0);
         camera.rotate(delta_phi, delta_theta);
         rotate(delta_phi, delta_theta);
+    }
+
+    public void breakBlock(Chunk chunk) {
+        Vector3f check_position = new Vector3f(camera.position);
+        Vector3f check_direction = new Vector3f(camera.orientation).normalize();
+        boolean atBlock = false;
+        while (!atBlock) {
+            check_position.add(new Vector3f(check_direction).mul(0.1f));
+            if (Math.abs(check_position.y) + 1 > chunk.vertical / 2 || Math.abs(check_position.x) + 1 > chunk.horizontal / 2 || Math.abs(check_position.z) + 1 > chunk.horizontal / 2 ) {
+                break;
+            }
+            if (chunk.block_array[Math.round(check_position.y) + chunk.vertical / 2][Math.round(check_position.x) + chunk.horizontal / 2][Math.round(check_position.z) + chunk.horizontal / 2] == 1 ) {
+                chunk.block_array[Math.round(check_position.y) + chunk.vertical / 2][Math.round(check_position.x) + chunk.horizontal / 2][Math.round(check_position.z) + chunk.horizontal / 2] = 0;
+                atBlock = true;
+            }
+        }
     }
 
     @Override

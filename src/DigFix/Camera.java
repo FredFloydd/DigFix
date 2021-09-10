@@ -33,6 +33,8 @@ public class Camera extends WorldObject {
         return aspect_ratio;
     }
 
+    public float getFov_y() { return  fov_y; }
+
     public void setAspectRatio(float aspect_ratio_) {
         aspect_ratio = aspect_ratio_;
     }
