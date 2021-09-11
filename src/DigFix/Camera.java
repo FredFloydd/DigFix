@@ -6,19 +6,19 @@ import org.joml.Vector3f;
 public class Camera extends WorldObject {
 
     // Field of view and aspect ratios
-    private final float fov_y; // Vertical field-of-view of camera in radians
-    private float aspect_ratio; // Aspect ratio of camera
+    private final float FOV_Y; // Vertical field-of-view of camera in radians
+    private float aspectRatio; // Aspect ratio of camera
 
     // Near and far clipping distances
-    private final float near_distance = 0.01f;
-    private final float far_distance = 1000f;
+    private final float NEAR_DISTANCE = 0.01f;
+    private final float FAR_DISTANCE = 1000f;
 
-    public Camera(double aspect_ratio, float fov_y, Vector3f position, Vector3f orientation, Vector3f up) {
-        this.aspect_ratio = (float) aspect_ratio;
+    public Camera(double aspectRatio, float FOV_Y, Vector3f position, Vector3f orientation, Vector3f up) {
+        this.aspectRatio = (float) aspectRatio;
         setPosition(position);
         setOrientation(orientation);
         this.up = up;
-        this.fov_y = fov_y;
+        this.FOV_Y = FOV_Y;
     }
 
     @Override
@@ -29,19 +29,27 @@ public class Camera extends WorldObject {
     }
 
     public Matrix4f getProjectionMatrix() {
-        return new Matrix4f().perspective(fov_y, aspect_ratio, near_distance, far_distance);
+        return new Matrix4f().perspective(FOV_Y, aspectRatio, NEAR_DISTANCE, FAR_DISTANCE);
     }
 
-    public void setAspectRatio(float aspect_ratio) { this.aspect_ratio = aspect_ratio; }
+    public void setAspectRatio(float aspectRatio) {
+        this.aspectRatio = aspectRatio;
+    }
 
     public float getAspectRatio() {
-        return aspect_ratio;
+        return aspectRatio;
     }
 
-    public float getFov_y() { return  fov_y; }
+    public float getFOV_Y() {
+        return FOV_Y;
+    }
 
-    public float getNearDistance() { return near_distance; }
+    public float getNearDistance() {
+        return NEAR_DISTANCE;
+    }
 
-    public float getFarDistance() { return far_distance; }
+    public float getFarDistance() {
+        return FAR_DISTANCE;
+    }
 
 }

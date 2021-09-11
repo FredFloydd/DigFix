@@ -17,7 +17,7 @@ public class Cuboid extends Component{
     private Vector3f origin;
 
     public Cuboid(Vector3f dimensions, Vector3f origin,  Vector3f position,
-                  Matrix4f orientation, String texture_filename) {
+                  Matrix4f orientation, String textureFilename) {
 
         // Initialise basic parameters
         this.x = dimensions.x;
@@ -30,29 +30,29 @@ public class Cuboid extends Component{
 
         // Initialise Shader
         shader = new ShaderProgram(new Shader(GL_VERTEX_SHADER, VSHADER_FN), new Shader(GL_FRAGMENT_SHADER, FSHADER_FN), "colour");
-        shader.bindDataToShader("oc_position", mesh.vertex_handle, 3);
-        shader.bindDataToShader("oc_normal", mesh.normal_handle, 3);
-        shader.bindDataToShader("texcoord", mesh.tex_handle, 2);
+        shader.bindDataToShader("oc_position", mesh.vertexHandle, 3);
+        shader.bindDataToShader("oc_normal", mesh.normalHandle, 3);
+        shader.bindDataToShader("texcoord", mesh.texHandle, 2);
 
         // Initialise Texturing
         texture = new Texture();
-        texture.load(texture_filename);
+        texture.load(textureFilename);
 
         // Build Transformation Matrices
-        initial_transform = new Matrix4f();
-        movement_transform = new Matrix4f();
+        initialTransform = new Matrix4f();
+        movementTransform = new Matrix4f();
 
         // Move to the initial position
-        initial_transform.translate(position);
+        initialTransform.translate(position);
 
         // Rotate to the initial orientation
-        initial_transform.mul(orientation);
+        initialTransform.mul(orientation);
 
         // Move to the new origin
-        initial_transform.translate(origin.mul(-1));
+        initialTransform.translate(origin.mul(-1));
 
         // Scale the transformation matrix
-        initial_transform.scale(x / 2f, y / 2f, z / 2f);
+        initialTransform.scale(x / 2f, y / 2f, z / 2f);
 
         // Initialise position
         this.position = position;
@@ -61,9 +61,9 @@ public class Cuboid extends Component{
 
     // Change dimensions while preserving origin
     public void changeDimensions(float x, float y, float z){
-        initial_transform.translate(origin);
-        initial_transform.scale(x / this.x, y / this.y, z / this.z);
-        initial_transform.translate(new Vector3f(origin).mul(-1));
+        initialTransform.translate(origin);
+        initialTransform.scale(x / this.x, y / this.y, z / this.z);
+        initialTransform.translate(new Vector3f(origin).mul(-1));
         this.x = x;
         this.y = y;
         this.z = z;
@@ -71,8 +71,8 @@ public class Cuboid extends Component{
 
     // Changes the position of the cuboid's origin
     public void  changeOrigin(Vector3f origin){
-        initial_transform.translate(origin);
-        initial_transform.translate(this.origin.mul(-1));
+        initialTransform.translate(origin);
+        initialTransform.translate(this.origin.mul(-1));
         this.origin = origin;
     }
 }

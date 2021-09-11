@@ -8,7 +8,7 @@ public abstract class Block extends WorldObject {
 
     // Cuboid for rendering
     protected Cuboid appearance;
-    protected String texture_path;
+    protected String texturePath;
 
     // Vector position and rotation
     protected  Vector3i position;
@@ -19,5 +19,7 @@ public abstract class Block extends WorldObject {
         return new Matrix4f().translate((Vector3fc) position).lookAlong((Vector3fc) orientation, up);
     }
 
-    public Cuboid getAppearance() { return appearance; }
+    public Cuboid getAppearance() {
+        return appearance;
+    }
 }

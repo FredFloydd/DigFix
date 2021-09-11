@@ -21,11 +21,11 @@ import org.lwjgl.BufferUtils;
 public abstract class Mesh {
 
 	// Shape and rendering properties
-	public int vertex_array_obj;
-	public int no_of_triangles;
-	public int vertex_handle;
-	public int normal_handle;
-	public int tex_handle;
+	public int vertexArrayObj;
+	public int noOfTriangles;
+	public int vertexHandle;
+	public int normalHandle;
+	public int texHandle;
 
 	// Abstract methods that all subclasses should implement
 	abstract float[]  initializeVertexPositions(); 
@@ -39,68 +39,68 @@ public abstract class Mesh {
 	// Initialize mesh
 	public void initialize() {
 
-		float[] vert_positions = initializeVertexPositions();
+		float[] vertPositions = initializeVertexPositions();
 		int[] indices = initializeVertexIndices();
-		float[] vert_normals = initializeVertexNormals();
-		float[] texture_coordinates = initializeTextureCoordinates();
-		no_of_triangles = indices.length;
+		float[] vertNormals = initializeVertexNormals();
+		float[] textureCoordinates = initializeTextureCoordinates();
+		noOfTriangles = indices.length;
 
-		loadDataOntoGPU( vert_positions, indices, vert_normals, texture_coordinates );
+		loadDataOntoGPU( vertPositions, indices, vertNormals, textureCoordinates );
 	}
 	
 	// Move the data from Java arrays to OpenGL buffers (these are most likely on the GPU)
 	protected void loadDataOntoGPU( float[] vertPositions, int[] indices, float[] vertNormals, float[] textureCoordinates ) {
 
-		vertex_array_obj = glGenVertexArrays(); // Get a OGL "name" for a vertex-array object
-		glBindVertexArray(vertex_array_obj); // Create a new vertex-array object with that name
+		vertexArrayObj = glGenVertexArrays(); // Get a OGL "name" for a vertex-array object
+		glBindVertexArray(vertexArrayObj); // Create a new vertex-array object with that name
 
 		// ---------------------------------------------------------------
 		// LOAD VERTEX POSITIONS
 		// ---------------------------------------------------------------
 
 		// Construct the vertex buffer in CPU memory
-		FloatBuffer vertex_buffer = BufferUtils.createFloatBuffer(vertPositions.length);
-		vertex_buffer.put(vertPositions); // Put the vertex array into the CPU buffer
-		vertex_buffer.flip(); // "flip" is used to change the buffer from read to write mode
+		FloatBuffer vertexBuffer = BufferUtils.createFloatBuffer(vertPositions.length);
+		vertexBuffer.put(vertPositions); // Put the vertex array into the CPU buffer
+		vertexBuffer.flip(); // "flip" is used to change the buffer from read to write mode
 
-		vertex_handle = glGenBuffers(); // Get an OGL name for a buffer object
-		glBindBuffer(GL_ARRAY_BUFFER, vertex_handle); // Bring that buffer object into existence on GPU
-		glBufferData(GL_ARRAY_BUFFER, vertex_buffer, GL_STATIC_DRAW); // Load the GPU buffer object with data
+		vertexHandle = glGenBuffers(); // Get an OGL name for a buffer object
+		glBindBuffer(GL_ARRAY_BUFFER, vertexHandle); // Bring that buffer object into existence on GPU
+		glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW); // Load the GPU buffer object with data
 
 		// ---------------------------------------------------------------
 		// LOAD VERTEX NORMALS
 		// ---------------------------------------------------------------
-		FloatBuffer normal_buffer = BufferUtils.createFloatBuffer(vertNormals.length);
-		normal_buffer.put(vertNormals); // Put the normal array into the CPU buffer
-		normal_buffer.flip(); // "flip" is used to change the buffer from read to write mode
+		FloatBuffer normalBuffer = BufferUtils.createFloatBuffer(vertNormals.length);
+		normalBuffer.put(vertNormals); // Put the normal array into the CPU buffer
+		normalBuffer.flip(); // "flip" is used to change the buffer from read to write mode
 
-		normal_handle = glGenBuffers(); // Get an OGL name for a buffer object
-		glBindBuffer(GL_ARRAY_BUFFER, normal_handle); // Bring that buffer object into existence on GPU
-		glBufferData(GL_ARRAY_BUFFER, normal_buffer, GL_STATIC_DRAW); // Load the GPU buffer object with data
+		normalHandle = glGenBuffers(); // Get an OGL name for a buffer object
+		glBindBuffer(GL_ARRAY_BUFFER, normalHandle); // Bring that buffer object into existence on GPU
+		glBufferData(GL_ARRAY_BUFFER, normalBuffer, GL_STATIC_DRAW); // Load the GPU buffer object with data
 
 
 		// ---------------------------------------------------------------
 		// LOAD VERTEX INDICES
 		// ---------------------------------------------------------------
 
-		IntBuffer index_buffer = BufferUtils.createIntBuffer(indices.length);
-		index_buffer.put(indices).flip();
-		int index_handle = glGenBuffers();
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_handle);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_buffer, GL_STATIC_DRAW);
+		IntBuffer indexBuffer = BufferUtils.createIntBuffer(indices.length);
+		indexBuffer.put(indices).flip();
+		int indexHandle = glGenBuffers();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexHandle);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer, GL_STATIC_DRAW);
 
 		// ---------------------------------------------------------------
 		// LOAD Texture coordinates
 		// ---------------------------------------------------------------
 
 		// Put texture coordinate array into a buffer in CPU memory
-		FloatBuffer tex_buffer = BufferUtils.createFloatBuffer(textureCoordinates.length);
-		tex_buffer.put(textureCoordinates).flip();
+		FloatBuffer texBuffer = BufferUtils.createFloatBuffer(textureCoordinates.length);
+		texBuffer.put(textureCoordinates).flip();
 
 		// Create an OpenGL buffer and load it with texture coordinate data
-		tex_handle = glGenBuffers();
-		glBindBuffer(GL_ARRAY_BUFFER, tex_handle);
-		glBufferData(GL_ARRAY_BUFFER, tex_buffer, GL_STATIC_DRAW);
+		texHandle = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, texHandle);
+		glBufferData(GL_ARRAY_BUFFER, texBuffer, GL_STATIC_DRAW);
 
 	}
 }

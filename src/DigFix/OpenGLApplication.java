@@ -23,12 +23,12 @@ public class OpenGLApplication {
 	private Camera camera;
 	private long window;
 	
-	private long current_time;
+	private long currentTime;
 
 	// Callbacks for input handling
-	private GLFWCursorPosCallback cursor_cb;
-	private GLFWKeyCallback key_cb;
-	private GLFWMouseButtonCallback mouse_cb;
+	private GLFWCursorPosCallback cursorCB;
+	private GLFWKeyCallback keyCB;
+	private GLFWMouseButtonCallback mouseCB;
 
 	// Chunk made up of dirt blocks
 	private Chunk chunk;
@@ -37,8 +37,8 @@ public class OpenGLApplication {
 	// Player and Robot for view control
 	private Player player;
 	private Robot robot;
-	private int centre_x;
-	private int centre_y;
+	private int centreX;
+	private int centreY;
 
 	// Initialize OpenGL and the world
 	public void initialize() throws Exception {
@@ -80,9 +80,9 @@ public class OpenGLApplication {
 
 		// Set up robot and centre coordinates for mouse tracking
 		robot = new Robot();
-		centre_x = mode.width() / 2;
-		centre_y = mode.height() / 2;
-		robot.mouseMove(centre_x, centre_y);
+		centreX = mode.width() / 2;
+		centreY = mode.height() / 2;
+		robot.mouseMove(centreX, centreY);
 
 		// Create player
 		player = new Player(new Vector3f(0f, 0f, 5f), new Vector3f(0f, 0f, -1f),
@@ -99,43 +99,43 @@ public class OpenGLApplication {
 		chunk = new Chunk(new Vector2i());
 		skybox = new Cuboid(new Vector3f(1000), new Vector3f(), new Vector3f(), new Matrix4f(), "resources/skybox.png");
 
-		current_time = System.currentTimeMillis();
+		currentTime = System.currentTimeMillis();
 	}
 
 	private void initializeInputs() {
 
 		// Callback for: when dragging the mouse, rotate the camera
-		robot.mouseMove(centre_x, centre_y);
-		cursor_cb = new GLFWCursorPosCallback() {
+		robot.mouseMove(centreX, centreY);
+		cursorCB = new GLFWCursorPosCallback() {
 
 			public void invoke(long window, double mouseX, double mouseY) {
 				float sensitivity = 0.005f;
 				float angleX = (float) (mouseX - 640) * sensitivity;
 				float angleY = (float) (mouseY - 330) * sensitivity;
 				player.updatePlayerOrientation(angleX, angleY);
-				robot.mouseMove(centre_x, centre_y);
+				robot.mouseMove(centreX, centreY);
 			}
 		};
 
 		// Callback for keyboard controls: WASD to move
-		key_cb = new GLFWKeyCallback() {
+		keyCB = new GLFWKeyCallback() {
 			public void invoke(long window, int key, int scancode, int action, int mods) {
 				if (key == GLFW_KEY_W && action == GLFW_PRESS) {
-					player.walking_directions.x = 1;
+					player.walkingDirections.x = 1;
 				} else if (key == GLFW_KEY_W && action == GLFW_RELEASE) {
-					player.walking_directions.x = 0;
+					player.walkingDirections.x = 0;
 				} else if (key == GLFW_KEY_S && action == GLFW_PRESS) {
-					player.walking_directions.z = 1;
+					player.walkingDirections.z = 1;
 				} else if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
-					player.walking_directions.z = 0;
+					player.walkingDirections.z = 0;
 				} else if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-					player.walking_directions.w = 1;
+					player.walkingDirections.w = 1;
 				} else if (key == GLFW_KEY_A && action == GLFW_RELEASE) {
-					player.walking_directions.w = 0;
+					player.walkingDirections.w = 0;
 				} else if (key == GLFW_KEY_D && action == GLFW_PRESS) {
-					player.walking_directions.y = 1;
+					player.walkingDirections.y = 1;
 				} else if (key == GLFW_KEY_D && action == GLFW_RELEASE) {
-					player.walking_directions.y = 0;
+					player.walkingDirections.y = 0;
 				} else if (key == GLFW_KEY_P && action == GLFW_PRESS) {
 					stop();
 				}
@@ -143,7 +143,7 @@ public class OpenGLApplication {
 		};
 
 		// Callback for mouse controls: Left click to mine
-		mouse_cb = new GLFWMouseButtonCallback() {
+		mouseCB = new GLFWMouseButtonCallback() {
 			public void invoke(long window, int key, int action, int mods) {
 				if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 					player.breakBlock(chunk);
@@ -159,9 +159,9 @@ public class OpenGLApplication {
 		};
 
 		// Set callbacks on the window
-		glfwSetCursorPosCallback(window, cursor_cb);
-		glfwSetKeyCallback(window, key_cb);
-		glfwSetMouseButtonCallback(window, mouse_cb);
+		glfwSetCursorPosCallback(window, cursorCB);
+		glfwSetKeyCallback(window, keyCB);
+		glfwSetMouseButtonCallback(window, mouseCB);
 		glfwSetFramebufferSizeCallback(window, fbs_cb);
 	}
 
@@ -182,11 +182,11 @@ public class OpenGLApplication {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set the background colour to white
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-		long new_time = System.currentTimeMillis();
+		long newTime = System.currentTimeMillis();
 
 		// Update player position
-		float deltaTime = (new_time - current_time) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
-		player.updatePosition(deltaTime, current_time);
+		float deltaTime = (newTime - currentTime) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
+		player.updatePosition(deltaTime, currentTime);
 
 		// Draw player and other world objects
 		//player.body.renderRobot(camera, deltaTime, currentTime);
@@ -195,7 +195,7 @@ public class OpenGLApplication {
 		skybox.render(camera);
 		glCullFace(GL_BACK);
 
-		current_time = new_time;
+		currentTime = newTime;
 
 		checkError();
 		

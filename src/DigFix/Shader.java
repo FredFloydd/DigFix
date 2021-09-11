@@ -14,7 +14,7 @@ public class Shader {
     private int shaderID = 0;
     private final int type;
     private final String filename;
-    private long shader_timestamp = 0;
+    private long shaderTimestamp = 0;
 
     public Shader(int type, String filename) {
         this.type = type;
@@ -26,17 +26,17 @@ public class Shader {
     public void load(int type, String filename) {
 
         // Read the shaderID source code from file
-        String shader_source = null;
+        String shaderSource = null;
         try {
-            List<String> shader_source_lines = Files.readAllLines(Paths.get(filename));
-            shader_source = String.join("\n", shader_source_lines);
+            List<String> shaderSourceLines = Files.readAllLines(Paths.get(filename));
+            shaderSource = String.join("\n", shaderSourceLines);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load shaderID: " + filename);
         }
 
         // Create and compile the shaderID
         shaderID = glCreateShader(type);
-        glShaderSource(shaderID, shader_source);
+        glShaderSource(shaderID, shaderSource);
         glCompileShader(shaderID);
 
         // Check in case there was an error during compilation

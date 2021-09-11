@@ -16,7 +16,7 @@ public abstract class WorldObject {
     // Polar coordinates of the object's orientation
     protected double phi;
     protected double theta;
-    protected final double epsilon = 0.1;
+    protected final double EPSILON = 0.1;
 
     // Updates the orientation, given polar coordinates
     private void updateOrientation() {
@@ -33,45 +33,46 @@ public abstract class WorldObject {
     }
 
     // Rotates the object by the given polar angles
-    public void rotate(double delta_phi, double delta_theta){
-        phi += delta_phi;
+    public void rotate(double deltaPhi, double deltaTheta){
+        phi += deltaPhi;
         if (phi > 2 * Math.PI) { phi -= 2 * Math.PI; }
         if (phi < 0) { phi += 2 * Math.PI; }
-        theta = Math.max(epsilon, Math.min(Math.PI - epsilon, theta + delta_theta));
+        theta = Math.max(EPSILON, Math.min(Math.PI - EPSILON, theta + deltaTheta));
         updateOrientation();
     }
 
     // Sets the polars to the given values
-    public void setPolars(double phi_, double theta_) {
-        phi = phi_;
-        if (phi > 2 * Math.PI) {phi -= 2 * Math.PI;}
-        if (phi < 0) {phi += 2 * Math.PI;}
-        theta = Math.max(0.2, Math.min(Math.PI - 0.2, theta_));
+    public void setPolars(double phi, double theta) {
+        this.phi = phi;
+        if (this.phi > 2 * Math.PI) {this.phi -= 2 * Math.PI;}
+        if (this.phi < 0) {this.phi += 2 * Math.PI;}
+        this.theta = Math.max(EPSILON, Math.min(Math.PI - EPSILON, theta));
         updateOrientation();
     }
 
     // Moves the object by the given vector in world coordinates
-    public void move(Vector3f movement_vector){
-        position.x -= movement_vector.x;
-        position.y += movement_vector.y;
-        position.z -= movement_vector.z;
+    public void move(Vector3f movementVector) {
+        position.x -= movementVector.x;
+        position.y += movementVector.y;
+        position.z -= movementVector.z;
     }
 
-    public void setPosition(Vector3f new_position){
-        position = new_position;
+    public void setPosition(Vector3f newPosition) {
+        position = newPosition;
     }
 
-    public void setOrientation(Vector3f new_direction){
-        orientation = new_direction;
+    public void setOrientation(Vector3f newDirection) {
+        orientation = newDirection;
         updatePolars();
     }
 
-    public Vector3f getOrientation(){
+    public Vector3f getOrientation() {
         return orientation;
     }
 
-    public Vector3f getPosition() { return position; }
+    public Vector3f getPosition() {
+        return position;
+    }
 
     public abstract Matrix4f getTransform();
-
 }

@@ -15,28 +15,28 @@ import org.lwjgl.BufferUtils;
 
 // Combines vertex and fragment Shaders into a single program that can be used for rendering.
 public class ShaderProgram {
-    Shader vertex_shader;
-    Shader fragment_shader;
-    String output_variable;
+    Shader vertexShader;
+    Shader fragmentShader;
+    String outputVariable;
     private int program = 0;
 
-    public ShaderProgram(Shader vertex_shader, Shader fragment_shader, String output_variable) {
-        this.vertex_shader = vertex_shader;
-        this.fragment_shader = fragment_shader;
-        this.output_variable = output_variable;
+    public ShaderProgram(Shader vertexShader, Shader fragmentShader, String outputVariable) {
+        this.vertexShader = vertexShader;
+        this.fragmentShader = fragmentShader;
+        this.outputVariable = outputVariable;
 
-        createProgram( output_variable );
+        createProgram(outputVariable);
     }
 
-    public void createProgram( String output_variable )
+    public void createProgram( String outputVariable )
     {
         if( program != 0 )
             glDeleteProgram( program );
 
         program = glCreateProgram();
-        glAttachShader(program, vertex_shader.getHandle());
-        glAttachShader(program, fragment_shader.getHandle());
-        glBindFragDataLocation(program, 0, output_variable);
+        glAttachShader(program, vertexShader.getHandle());
+        glAttachShader(program, fragmentShader.getHandle());
+        glBindFragDataLocation(program, 0, outputVariable);
         glLinkProgram(program);
         glUseProgram(program);
     }
@@ -55,16 +55,16 @@ public class ShaderProgram {
         glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferHandle); // Bring that buffer object into existence on GPU
 
         // Get the locations of the "position" vertex attribute variable in our ShaderProgram
-		int variable_loc = glGetAttribLocation(getHandle(), variableName);
+		int variableLoc = glGetAttribLocation(getHandle(), variableName);
 
 		// If the vertex attribute does not exist, position_loc will be -1, so we should not use it
-		if (variable_loc != -1) {
+		if (variableLoc != -1) {
 
 			// Specifies where the data for given variable can be accessed
-			glVertexAttribPointer(variable_loc, AttribSize, GL_FLOAT, false, 0, 0);
+			glVertexAttribPointer(variableLoc, AttribSize, GL_FLOAT, false, 0, 0);
 
 			// Enable that vertex attribute variable
-			glEnableVertexAttribArray(variable_loc);
+			glEnableVertexAttribArray(variableLoc);
 		} else {
 			System.out.println("NO " + variableName);
 		}
