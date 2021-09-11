@@ -1,44 +1,33 @@
 package DigFix;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
-import static org.lwjgl.opengl.GL20.glEnableVertexAttribArray;
-import static org.lwjgl.opengl.GL20.glGetAttribLocation;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
 import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 
-/**
- * Abstract class encapsulating a 3D mesh object
- * Mesh object must have 3D position, UV texture coordiantes and normals
- *
- */
+
+// Abstract class encapsulating a 3D mesh object
+// Mesh object must have 3D position, UV texture coordinates and normals
+
 public abstract class Mesh {
 
-	// shape/rendering properties
-	public int vertexArrayObj;
+	// Shape and rendering properties
+	public int vertex_array_obj;
 	public int no_of_triangles;
 	public int vertex_handle;
 	public int normal_handle;
 	public int tex_handle;
 
-	// abstract methods that all subclasses should implement
+	// Abstract methods that all subclasses should implement
 	abstract float[]  initializeVertexPositions(); 
 	abstract int[]  initializeVertexIndices();
 	abstract float[]  initializeVertexNormals();
@@ -50,20 +39,20 @@ public abstract class Mesh {
 	// Initialize mesh
 	public void initialize() {
 
-		float[] vertPositions = initializeVertexPositions();
+		float[] vert_positions = initializeVertexPositions();
 		int[] indices = initializeVertexIndices();
-		float[] vertNormals = initializeVertexNormals();
-		float[] textureCoordinates = initializeTextureCoordinates();
+		float[] vert_normals = initializeVertexNormals();
+		float[] texture_coordinates = initializeTextureCoordinates();
 		no_of_triangles = indices.length;
 
-		loadDataOntoGPU( vertPositions, indices, vertNormals, textureCoordinates );
+		loadDataOntoGPU( vert_positions, indices, vert_normals, texture_coordinates );
 	}
 	
 	// Move the data from Java arrays to OpenGL buffers (these are most likely on the GPU)
 	protected void loadDataOntoGPU( float[] vertPositions, int[] indices, float[] vertNormals, float[] textureCoordinates ) {
 
-		vertexArrayObj = glGenVertexArrays(); // Get a OGL "name" for a vertex-array object
-		glBindVertexArray(vertexArrayObj); // Create a new vertex-array object with that name
+		vertex_array_obj = glGenVertexArrays(); // Get a OGL "name" for a vertex-array object
+		glBindVertexArray(vertex_array_obj); // Create a new vertex-array object with that name
 
 		// ---------------------------------------------------------------
 		// LOAD VERTEX POSITIONS

@@ -1,6 +1,5 @@
 package DigFix;
 
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -17,6 +16,7 @@ public abstract class WorldObject {
     // Polar coordinates of the object's orientation
     protected double phi;
     protected double theta;
+    protected final double epsilon = 0.1;
 
     // Updates the orientation, given polar coordinates
     private void updateOrientation() {
@@ -37,7 +37,7 @@ public abstract class WorldObject {
         phi += delta_phi;
         if (phi > 2 * Math.PI) { phi -= 2 * Math.PI; }
         if (phi < 0) { phi += 2 * Math.PI; }
-        theta = Math.max(0.2, Math.min(Math.PI- 0.2, theta + delta_theta));
+        theta = Math.max(epsilon, Math.min(Math.PI - epsilon, theta + delta_theta));
         updateOrientation();
     }
 
@@ -70,9 +70,7 @@ public abstract class WorldObject {
         return orientation;
     }
 
-    public Vector3f getPosition() {
-        return position;
-    }
+    public Vector3f getPosition() { return position; }
 
     public abstract Matrix4f getTransform();
 

@@ -1,17 +1,8 @@
 package DigFix;
 
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
-import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniform3f;
+// Class inheriting from Mesh class
+// Defines a Cube mesh by overloading Mesh's 3D position, UV texture coordinates and normals
 
-import org.joml.Vector3f;
-
-/**
- * Class inheriting from Mesh class
- * Defines a Cube mesh by overloading Mesh's 3D position, UV texture coordinates and normals
- *
- */
 public class CubeMesh extends Mesh {
     
 	public CubeMesh() {

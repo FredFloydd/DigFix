@@ -19,17 +19,17 @@ public class Player extends WorldObject {
     // Define up direction for the camera
     private final Vector3f up;
 
-    public Player(Vector3f position_, Vector3f orientation_, float aspect_ratio, float fov_y, Vector3f up_) {
-        body = new CubeRobot(position_, new Vector3f(orientation_.x, orientation_.y, orientation_.z));
-        up = up_;
-        camera = new Camera(aspect_ratio, fov_y, new Vector3f(position_.x, position_.y + body.viewHeight,  position_.z), orientation_, up);
-        setPosition(position_);
-        setOrientation(orientation_);
-        body.setOrientation(new Vector3f(orientation_.x, orientation_.y, orientation_.z));
-        walking_directions = new Vector4i(0);
+    public Player(Vector3f position, Vector3f orientation, float aspect_ratio, float fov_y, Vector3f up) {
+        this.body = new CubeRobot(position, new Vector3f(orientation.x, orientation.y, orientation.z));
+        this.up = up;
+        this.camera = new Camera(aspect_ratio, fov_y, new Vector3f(position.x, position.y + body.viewHeight,  position.z), orientation, up);
+        this.walking_directions = new Vector4i(0);
+        setPosition(position);
+        setOrientation(orientation);
+        body.setOrientation(new Vector3f(orientation.x, orientation.y, orientation.z));
     }
 
-    public void updatePosition(float delta_time, long currentTime) {
+    public void updatePosition(float delta_time, long current_time) {
         // Move player based on keyboard input
         Vector3f move_vector = new Vector3f();
         int forwards = walking_directions.z - walking_directions.x;
@@ -38,15 +38,15 @@ public class Player extends WorldObject {
         Vector3f sideways_vector = new Vector3f();
         forwards_vector.cross(up, sideways_vector);
         sideways_vector.normalize();
-        move_vector = move_vector.add(forwards_vector.mul(forwards)).add(sideways_vector.mul(sideways));
+        move_vector.add(forwards_vector.mul(forwards)).add(sideways_vector.mul(sideways));
 
         // If move vector isn't null, move and animate the player
         if (move_vector.x != 0 || move_vector.z != 0) {
-            move_vector = move_vector.normalize().mul(walk_speed * delta_time);
+            move_vector.normalize().mul(walk_speed * delta_time);
             move(move_vector);
             camera.move(move_vector);
             if (!body.walking) {
-                body.start_walking = currentTime;
+                body.start_walking = current_time;
             }
             body.walking = true;
         }

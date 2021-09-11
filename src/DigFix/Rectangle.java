@@ -1,25 +1,11 @@
 package DigFix;
 
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 
-import static org.lwjgl.opengl.GL11.GL_NO_ERROR;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
-import static org.lwjgl.opengl.GL11.glDrawElements;
-import static org.lwjgl.opengl.GL11.glGetError;
+
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
-import static org.lwjgl.opengl.GL20.glGetUniformLocation;
-import static org.lwjgl.opengl.GL20.glUniformMatrix4fv;
-import static org.lwjgl.opengl.GL20.glUniform3f;
-import static org.lwjgl.opengl.GL30.glBindVertexArray;
-
-import java.lang.Math;
-import java.nio.FloatBuffer;
 
 public class Rectangle extends Component {
 
@@ -30,13 +16,13 @@ public class Rectangle extends Component {
     // Location of origin within cuboid
     private Vector3f origin;
 
-    public Rectangle(Vector3f dimensions, Vector3f origin_,  Vector3f initial_position,
-                  Matrix4f initial_orientation, String texture_filename) {
+    public Rectangle(Vector3f dimensions, Vector3f origin,  Vector3f position,
+                  Matrix4f orientation, String texture_filename) {
 
         // Initialise basic parameters
-        x = dimensions.x;
-        z = dimensions.z;
-        origin = origin_;
+        this.x = dimensions.x;
+        this.z = dimensions.z;
+        this.origin = origin;
 
         // Initialise mesh
         mesh = new RectangleMesh();
@@ -56,10 +42,10 @@ public class Rectangle extends Component {
         movement_transform = new Matrix4f();
 
         // Move to the initial position
-        initial_transform.translate(initial_position);
+        initial_transform.translate(position);
 
         // Rotate to the initial orientation
-        initial_transform.mul(initial_orientation);
+        initial_transform.mul(orientation);
 
         // Move to the new origin
         initial_transform.translate(origin.mul(-1));
@@ -68,26 +54,23 @@ public class Rectangle extends Component {
         initial_transform.scale(x / 2f, 1f, z / 2f);
 
         // Initialise position
-        position = initial_position;
-        orientation = initial_orientation;
+        this.position = position;
+        this.orientation = orientation;
     }
 
     // Change dimensions while preserving origin
-    public void change_Dimensions(float newX, float newY, float newZ){
-        initial_transform = initial_transform.translate(origin);
-        initial_transform = initial_transform.scale(newX / x, 1f, newZ / z);
-        initial_transform = initial_transform.translate(origin.mul(-1));
-
-        origin = origin.mul(-1);
-        x = newX;
-        z = newZ;
+    public void changeDimensions(float x, float z){
+        initial_transform.translate(origin);
+        initial_transform.scale(x / this.x, 1f, z / this.z);
+        initial_transform.translate(new Vector3f(origin).mul(-1));
+        this.x = x;
+        this.z = z;
     }
 
     // Changes the position of the cuboid's origin
-    public void  change_Origin(Vector3f newOrigin){
-        initial_transform = initial_transform.translate(newOrigin);
-        initial_transform = initial_transform.translate(origin.mul(-1));
-
-        origin = newOrigin;
+    public void  changeOrigin(Vector3f origin){
+        initial_transform.translate(origin);
+        initial_transform.translate(this.origin.mul(-1));
+        this.origin = origin;
     }
 }

@@ -9,8 +9,6 @@ import javax.imageio.ImageIO;
 
 import org.lwjgl.opengl.*;
 
-import static org.lwjgl.opengl.GL21.GL_SRGB8;
-
 public class Texture {
 
   int texId;
@@ -25,15 +23,15 @@ public class Texture {
 
   public int load(String filename) {
     ByteBuffer buffer = null;
-    int tWidth = 0;
-    int tHeight = 0;
+    int t_width = 0;
+    int t_height = 0;
 
     // Link the PNG decoder to this stream
     BufferedImage image = loadImageFromFile(filename);
 
     // Get the width and height of the texture
-    tWidth = image.getWidth();
-    tHeight = image.getHeight();
+    t_width = image.getWidth();
+    t_height = image.getHeight();
 
     // Decode the PNG file in a ByteBuffer
     buffer = ByteBuffer.allocateDirect(4 * image.getWidth() * image.getHeight());
@@ -59,7 +57,7 @@ public class Texture {
 
     // Upload the texture data.
     // Note that the internal texture format is sRGB since the shading is in the linear colour domain.
-    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL21.GL_SRGB8, tWidth, tHeight, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
+    GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL21.GL_SRGB8, t_width, t_height, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buffer);
 
 
     // Setup what to do when the texture has to be scaled

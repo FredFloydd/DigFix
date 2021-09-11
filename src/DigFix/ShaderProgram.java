@@ -41,14 +41,6 @@ public class ShaderProgram {
         glUseProgram(program);
     }
 
-    public void reloadIfNeeded() {
-        boolean vertex_shader_reloaded = vertex_shader.reloadIfNeeded();
-        boolean fragment_shader_reloaded = fragment_shader.reloadIfNeeded();
-
-        if( vertex_shader_reloaded || fragment_shader_reloaded )
-            createProgram( output_variable );
-    }
-
     public int getHandle() {
         return program;
     }
@@ -63,16 +55,16 @@ public class ShaderProgram {
         glBindBuffer(GL_ARRAY_BUFFER, ArrayBufferHandle); // Bring that buffer object into existence on GPU
 
         // Get the locations of the "position" vertex attribute variable in our ShaderProgram
-		int variableLoc = glGetAttribLocation(getHandle(), variableName);
+		int variable_loc = glGetAttribLocation(getHandle(), variableName);
 
 		// If the vertex attribute does not exist, position_loc will be -1, so we should not use it
-		if (variableLoc != -1) {
+		if (variable_loc != -1) {
 
 			// Specifies where the data for given variable can be accessed
-			glVertexAttribPointer(variableLoc, AttribSize, GL_FLOAT, false, 0, 0);
+			glVertexAttribPointer(variable_loc, AttribSize, GL_FLOAT, false, 0, 0);
 
 			// Enable that vertex attribute variable
-			glEnableVertexAttribArray(variableLoc);
+			glEnableVertexAttribArray(variable_loc);
 		} else {
 			System.out.println("NO " + variableName);
 		}

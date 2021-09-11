@@ -14,7 +14,7 @@ public class Shader {
     private int shaderID = 0;
     private final int type;
     private final String filename;
-    private long shaderTimestamp = 0;
+    private long shader_timestamp = 0;
 
     public Shader(int type, String filename) {
         this.type = type;
@@ -26,17 +26,17 @@ public class Shader {
     public void load(int type, String filename) {
 
         // Read the shaderID source code from file
-        String shaderSource = null;
+        String shader_source = null;
         try {
-            List<String> shaderSourceLines = Files.readAllLines(Paths.get(filename));
-            shaderSource = String.join("\n", shaderSourceLines);
+            List<String> shader_source_lines = Files.readAllLines(Paths.get(filename));
+            shader_source = String.join("\n", shader_source_lines);
         } catch (IOException e) {
             throw new RuntimeException("Failed to load shaderID: " + filename);
         }
 
         // Create and compile the shaderID
         shaderID = glCreateShader(type);
-        glShaderSource(shaderID, shaderSource);
+        glShaderSource(shaderID, shader_source);
         glCompileShader(shaderID);
 
         // Check in case there was an error during compilation
@@ -46,39 +46,6 @@ public class Shader {
             System.out.println(error);
             glDeleteShader(shaderID);
             throw new RuntimeException("shader compilation failed: consult the log above");
-        }
-    }
-
-
-     // Reload shader if the file has been modified
-    public boolean reloadIfNeeded() {
-        long timestamp = getFragmentShaderTimestamp();
-        if (shaderTimestamp != timestamp) {
-
-            int old_shaderID = shaderID;
-
-            try {
-                load(type, filename);
-            } catch (RuntimeException e) {
-                // Recover (to the old shader) if the new shader cannot be compiled
-                shaderID = old_shaderID;
-                shaderTimestamp = timestamp;
-                return false;
-            }
-            shaderTimestamp = timestamp;
-            if( old_shaderID != 0 ) // Free existing shaderID
-                glDeleteShader(old_shaderID);
-
-            return true;
-        }
-        return false;
-    }
-
-    private long getFragmentShaderTimestamp() {
-        try {
-            return new File(filename).lastModified();
-        } catch (Exception e) {
-            return -1;
         }
     }
 

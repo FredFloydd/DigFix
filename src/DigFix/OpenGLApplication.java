@@ -3,31 +3,19 @@ package DigFix;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
-import org.joml.Vector3i;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.glfw.*;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.nio.ByteBuffer;
 
+import org.lwjgl.glfw.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
-import static org.lwjgl.opengl.GL15.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.GL30.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 
-/***
- * Class for an OpenGL Window with rendering loop and meshes to draw
- *
- */
+// Class for an OpenGL Window with rendering loop and meshes to draw
+
 public class OpenGLApplication {
 
 	private static final float FOV_Y = (float) Math.toRadians(50);
@@ -35,13 +23,10 @@ public class OpenGLApplication {
 	private Camera camera;
 	private long window;
 	
-	private long currentTime;
-	private long startTime;
-	private long elapsedTime;
+	private long current_time;
 
 	// Callbacks for input handling
 	private GLFWCursorPosCallback cursor_cb;
-	private GLFWScrollCallback scroll_cb;
 	private GLFWKeyCallback key_cb;
 	private GLFWMouseButtonCallback mouse_cb;
 
@@ -103,24 +88,24 @@ public class OpenGLApplication {
 		player = new Player(new Vector3f(0f, 0f, 5f), new Vector3f(0f, 0f, -1f),
 				((float) WIDTH / (float) HEIGHT), FOV_Y, new Vector3f(0f, 1f, 0f));
 
-		// Create camera, and setup input handlers
+		// Create camera
 		camera = player.camera;
 		//camera = new Camera((float) WIDTH / (float) HEIGHT, FOV_Y, new Vector3f(0f, 1.75f, 40f), new Vector3f(0f, 0f, -1f), camera.up);
+
+		// Setup input handlers
 		initializeInputs();
 
 		// This is where we are creating the meshes
 		chunk = new Chunk(new Vector2i());
 		skybox = new Cuboid(new Vector3f(1000), new Vector3f(), new Vector3f(), new Matrix4f(), "resources/skybox.png");
 
-		startTime = System.currentTimeMillis();
-		currentTime = System.currentTimeMillis();
+		current_time = System.currentTimeMillis();
 	}
 
 	private void initializeInputs() {
 
 		// Callback for: when dragging the mouse, rotate the camera
 		robot.mouseMove(centre_x, centre_y);
-		// Callback for: when dragging the mouse, rotate the camera
 		cursor_cb = new GLFWCursorPosCallback() {
 
 			public void invoke(long window, double mouseX, double mouseY) {
@@ -157,7 +142,7 @@ public class OpenGLApplication {
 			}
 		};
 
-		// Callback for keyboard controls: WASD to move
+		// Callback for mouse controls: Left click to mine
 		mouse_cb = new GLFWMouseButtonCallback() {
 			public void invoke(long window, int key, int action, int mods) {
 				if (key == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
@@ -175,7 +160,6 @@ public class OpenGLApplication {
 
 		// Set callbacks on the window
 		glfwSetCursorPosCallback(window, cursor_cb);
-		glfwSetScrollCallback(window, scroll_cb);
 		glfwSetKeyCallback(window, key_cb);
 		glfwSetMouseButtonCallback(window, mouse_cb);
 		glfwSetFramebufferSizeCallback(window, fbs_cb);
@@ -198,23 +182,20 @@ public class OpenGLApplication {
 		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set the background colour to white
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	
 
-		long newTime = System.currentTimeMillis();
-
-		elapsedTime += newTime - currentTime; // Time elapsed since the beginning of this program in milliseconds
+		long new_time = System.currentTimeMillis();
 
 		// Update player position
-		float deltaTime = (newTime - currentTime) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
-		player.updatePosition(deltaTime, currentTime);
+		float deltaTime = (new_time - current_time) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
+		player.updatePosition(deltaTime, current_time);
 
-		// Draw player and other world entities
+		// Draw player and other world objects
 		//player.body.renderRobot(camera, deltaTime, currentTime);
 		chunk.renderChunk(camera, player.camera);
 		glCullFace(GL_FRONT);
 		skybox.render(camera);
 		glCullFace(GL_BACK);
 
-
-		currentTime = newTime;
+		current_time = new_time;
 
 		checkError();
 		

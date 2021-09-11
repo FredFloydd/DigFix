@@ -1,6 +1,5 @@
 package DigFix;
 
-import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -10,12 +9,16 @@ public class Camera extends WorldObject {
     private final float fov_y; // Vertical field-of-view of camera in radians
     private float aspect_ratio; // Aspect ratio of camera
 
-    public Camera(double aspect_ratio_, float fov_y_, Vector3f initial_position, Vector3f initial_direction, Vector3f up_) {
-        aspect_ratio = (float) aspect_ratio_;
-        setPosition(initial_position);
-        setOrientation(initial_direction);
-        up = up_;
-        fov_y = fov_y_;
+    // Near and far clipping distances
+    private final float near_distance = 0.01f;
+    private final float far_distance = 1000f;
+
+    public Camera(double aspect_ratio, float fov_y, Vector3f position, Vector3f orientation, Vector3f up) {
+        this.aspect_ratio = (float) aspect_ratio;
+        setPosition(position);
+        setOrientation(orientation);
+        this.up = up;
+        this.fov_y = fov_y;
     }
 
     @Override
@@ -26,8 +29,10 @@ public class Camera extends WorldObject {
     }
 
     public Matrix4f getProjectionMatrix() {
-        return new Matrix4f().perspective(fov_y, aspect_ratio, 0.01f, 1000f);
+        return new Matrix4f().perspective(fov_y, aspect_ratio, near_distance, far_distance);
     }
+
+    public void setAspectRatio(float aspect_ratio) { this.aspect_ratio = aspect_ratio; }
 
     public float getAspectRatio() {
         return aspect_ratio;
@@ -35,7 +40,8 @@ public class Camera extends WorldObject {
 
     public float getFov_y() { return  fov_y; }
 
-    public void setAspectRatio(float aspect_ratio_) {
-        aspect_ratio = aspect_ratio_;
-    }
+    public float getNearDistance() { return near_distance; }
+
+    public float getFarDistance() { return far_distance; }
+
 }
