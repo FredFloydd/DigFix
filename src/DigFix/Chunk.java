@@ -3,6 +3,7 @@ package DigFix;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
+import org.joml.Vector3i;
 
 public class Chunk {
 
@@ -15,30 +16,52 @@ public class Chunk {
     public Chunk(Vector2i chunkIndex) {
         chunkOrigin = chunkIndex.mul(HORIZONTAL);
         cuboid = new Cuboid(new Vector3f(1,1,1), new Vector3f(), new Vector3f(), new Matrix4f(), "resources/dirt_texture.png");
-        blockArray = new int[VERTICAL][HORIZONTAL][HORIZONTAL];
+        blockArray = new int[VERTICAL + 1][HORIZONTAL + 1][HORIZONTAL + 1];
         for (int y = -VERTICAL / 2; y < 0; y++) {
             for (int x = -HORIZONTAL / 2; x < HORIZONTAL / 2; x++) {
                 for (int z = -HORIZONTAL / 2; z < HORIZONTAL / 2; z++) {
-                    blockArray[y + VERTICAL / 2][x + HORIZONTAL / 2][z + HORIZONTAL / 2] = 1;
+                    setBlockType(x, y, z, 1);
                 }
             }
         }
     }
 
-    public void renderChunk(Camera camera1, Camera camera) {
+    public int getBlockType(int x, int y, int z) {
+        int xIndex = x + HORIZONTAL / 2;
+        int yIndex = y + VERTICAL / 2;
+        int zIndex = z + HORIZONTAL / 2;
+        return blockArray[yIndex][xIndex][zIndex];
+    }
+
+    public void setBlockType(int x, int y, int z, int value) {
+        int xIndex = x + HORIZONTAL / 2;
+        int yIndex = y + VERTICAL / 2;
+        int zIndex = z + HORIZONTAL / 2;
+        blockArray[yIndex][xIndex][zIndex] = value;
+    }
+
+    public boolean checkValidIndex(int x, int y, int z) {
+        return Math.abs(x) < HORIZONTAL / 2 && Math.abs(y) < VERTICAL / 2 && Math.abs(z) < HORIZONTAL / 2;
+    }
+
+    public void renderChunk(Camera camera) {
         for (int y = -VERTICAL / 2; y < VERTICAL / 2; y++) {
             for (int x = -HORIZONTAL / 2; x < HORIZONTAL / 2; x++) {
                 for (int z = -HORIZONTAL / 2; z < HORIZONTAL / 2; z++) {
-                    if (isBlock(x, y, z) && isInFoV(camera, x, y, z) && isVisible(camera, x, y, z)) {
-                        cuboid.render(camera1, new Matrix4f().translate(x - chunkOrigin.x, y, z - chunkOrigin.y));
+                    if (toRender(camera, x, y, z)) {
+                        cuboid.render(camera, new Matrix4f().translate(x + chunkOrigin.x, y, z + chunkOrigin.y));
                     }
                 }
             }
         }
     }
 
+    private boolean toRender(Camera camera, int x, int y, int z) {
+        return isBlock(x, y, z) && isInFoV(camera, x, y, z) && isVisible(camera, x, y, z);
+    }
+
     private boolean isBlock(int x, int y, int z) {
-        return blockArray[y + VERTICAL / 2][x + HORIZONTAL / 2][z + HORIZONTAL / 2] != 0;
+        return getBlockType(x, y, z) != 0;
     }
 
     private boolean isInFoV(Camera camera, int x, int y, int z) {
@@ -62,18 +85,15 @@ public class Chunk {
                 new Vector3f(blockOrigin).add(1f, 1f, 1f)
         };
         for (int i = 0; i < vertices.length; i++) {
-            Vector3f position = vertices[i];
-            Vector3f direction = (new Vector3f(camera.getPosition()).sub(position)).normalize();
+            Vector3f directionToCamera = (new Vector3f(camera.position).sub(vertices[i])).normalize();
+            Ray rayToCamera = new Ray(vertices[i], directionToCamera);
             boolean blocked = false;
             while (!blocked) {
-                position.add(new Vector3f(direction).mul(0.1f));
-                if (Math.abs(position.y) + 1 > VERTICAL / 2 || Math.abs(position.x) + 1 > HORIZONTAL / 2 || Math.abs(position.z) + 1 > HORIZONTAL / 2 ) {
-                    break;
-                }
-                if (blockArray[Math.round(position.y) + VERTICAL / 2][Math.round(position.x) + HORIZONTAL / 2][Math.round(position.z) + HORIZONTAL / 2] == 1 ) {
-                blocked = true;
-                }
-                if (new Vector3f(camera.getPosition()).sub(position).dot(direction) < 0) {
+                Vector3i blockIndex = rayToCamera.getNextBlockIntersection();
+                Vector3f rayPosition = rayToCamera.getCurrentPosition();
+                if (getBlockType(blockIndex.x, blockIndex.y, blockIndex.z) != 0) {
+                    blocked = true;
+                } else if (directionToCamera.dot(new Vector3f(rayPosition).sub(camera.getPosition())) < 0) {
                     return true;
                 }
             }

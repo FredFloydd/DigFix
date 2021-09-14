@@ -186,11 +186,11 @@ public class OpenGLApplication {
 
 		// Update player position
 		float deltaTime = (newTime - currentTime) / 1000.f; // Time taken to render this frame in seconds (= 0 when the application is paused)
-		player.updatePosition(deltaTime, currentTime);
+		player.updatePosition(deltaTime, currentTime, chunk);
 
 		// Draw player and other world objects
 		//player.body.renderRobot(camera, deltaTime, currentTime);
-		chunk.renderChunk(camera, player.camera);
+		chunk.renderChunk(camera);
 		glCullFace(GL_FRONT);
 		skybox.render(camera);
 		glCullFace(GL_BACK);

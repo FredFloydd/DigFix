@@ -13,6 +13,9 @@ public abstract class WorldObject {
     protected Vector3f orientation;
     protected Vector3f up;
 
+    // Velocity for physics
+    protected Vector3f velocity;
+
     // Polar coordinates of the object's orientation
     protected double phi;
     protected double theta;
